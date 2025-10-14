@@ -6,11 +6,18 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] float moveSpeed = 4f;
     [SerializeField] Animator anim;
-    [SerializeField] SpriteRenderer sprite; // gán trong Inspector (hoặc lấy ở child)
+    [SerializeField] SpriteRenderer sprite;
 
     Rigidbody2D rb;
     Vector2 moveInput;
-    Vector2 lastFacing = Vector2.right; // clip gốc vẽ hướng phải
+    Vector2 lastFacing = Vector2.right;
+
+    public bool MoveLocked { get; private set; }
+    public void SetMoveLock(bool locked)
+    {
+        MoveLocked = locked;
+        if (locked) rb.velocity = Vector2.zero;
+    }
 
     void Awake()
     {
@@ -21,12 +28,11 @@ public class PlayerController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
 
-    public void OnMove(InputValue v) // PlayerInput: Send Messages
+    public void OnMove(InputValue v)
     {
         moveInput = v.Get<Vector2>();
         if (moveInput.sqrMagnitude > 0.0001f)
         {
-            // ưu tiên ngang khi chéo
             if (Mathf.Abs(moveInput.x) >= Mathf.Abs(moveInput.y))
                 lastFacing = new Vector2(Mathf.Sign(moveInput.x), 0f);
             else
@@ -36,20 +42,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // flip ngang bằng SpriteRenderer
-        if (sprite) sprite.flipX = lastFacing.x < 0f; // trái = true, phải = false  :contentReference[oaicite:2]{index=2}
-
-        // blend tree 3 hướng: Up/Down/Side(1,0)
+        if (sprite) sprite.flipX = lastFacing.x < 0f;
         if (anim)
         {
-            anim.SetFloat("Horizontal", Mathf.Abs(lastFacing.x)); // 0 hoặc 1
-            anim.SetFloat("Vertical", lastFacing.y);            // -1,0,1
-            anim.SetFloat("Speed", moveInput.sqrMagnitude);
+            anim.SetFloat("Horizontal", Mathf.Abs(lastFacing.x));
+            anim.SetFloat("Vertical",   lastFacing.y);
+            anim.SetFloat("Speed",      MoveLocked ? 0f : moveInput.sqrMagnitude);
         }
     }
 
     void FixedUpdate()
     {
-        rb.velocity = moveInput.normalized * moveSpeed;
+        var input = MoveLocked ? Vector2.zero : moveInput;
+        rb.velocity = input.normalized * moveSpeed;
     }
 }
