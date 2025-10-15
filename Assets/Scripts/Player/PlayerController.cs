@@ -30,11 +30,22 @@ public class PlayerController : MonoBehaviour
     }
 
     public void OnMove(InputValue v)
+{
+    if (!canMove) { moveInput = Vector2.zero; return; }
+    moveInput = v.Get<Vector2>();
+
+    if (moveInput.sqrMagnitude > 0.0001f)
     {
-        if (!canMove) { moveInput = Vector2.zero; return; }
-        moveInput = v.Get<Vector2>();
-        if (moveInput.sqrMagnitude > 0.0001f) lastFacing = moveInput.normalized;
+        // Ưu tiên ngang khi chéo với W (AW/DW)
+        if (moveInput.y > 0.01f && Mathf.Abs(moveInput.x) > 0.01f)
+            lastFacing = new Vector2(Mathf.Sign(moveInput.x), 0f);
+        else if (Mathf.Abs(moveInput.x) >= Mathf.Abs(moveInput.y))
+            lastFacing = new Vector2(Mathf.Sign(moveInput.x), 0f);   // ưu tiên ngang mọi chéo
+        else
+            lastFacing = new Vector2(0f, Mathf.Sign(moveInput.y));   // lên/xuống
     }
+}
+
 
     void Update()
     {

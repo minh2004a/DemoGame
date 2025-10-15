@@ -9,8 +9,7 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] Animator anim;
     [SerializeField] SpriteRenderer sprite;
     [SerializeField] LayerMask enemyMask;
-    [SerializeField] float attackDistance = 0.6f; // tâm hit trước mặt
-    [SerializeField] float hitRadius = 0.35f;
+    [SerializeField] float defaultHitRadius = 0.35f; // giữ bán kính mặc định
     [SerializeField] float minCooldown = 0.15f;
 
     Rigidbody2D rb; Vector2 move, lastFacing = Vector2.down; float cd;
@@ -45,17 +44,38 @@ public class PlayerCombat : MonoBehaviour
     // Animation Events trên clip Attack:
     public void AttackStart() { LockMove(true); } // đặt ở đầu clip
 
-    public void AttackHit()
-    {                     // đặt đúng frame chém trúng
+    public void AttackHit() // gọi bằng Animation Event
+    {
         var it = inv?.CurrentItem; if (it == null) return;
-        Vector2 origin = rb.position;
-        Vector2 dir = (Mathf.Abs(lastFacing.x) >= Mathf.Abs(lastFacing.y)) ? new Vector2(Mathf.Sign(lastFacing.x), 0) : new Vector2(0, Mathf.Sign(lastFacing.y));
-        Vector2 center = origin + dir * attackDistance;
 
-        var hits = Physics2D.OverlapCircleAll(center, hitRadius, enemyMask);
-        foreach (var c in hits) c.GetComponentInParent<IDamageable>()?.TakeHit(it.power);
-        Debug.DrawRay(origin, dir * attackDistance, Color.yellow, 0.15f);
+        float dist = it.range > 0f ? it.range : 0.6f;      // lấy từ ItemSO
+        float rad = defaultHitRadius;
+
+        Vector2 origin = rb.position;
+        Vector2 dir = (Mathf.Abs(lastFacing.x) >= Mathf.Abs(lastFacing.y))
+                    ? new Vector2(Mathf.Sign(lastFacing.x), 0)
+                    : new Vector2(0, Mathf.Sign(lastFacing.y));
+
+        Vector2 center = origin + dir * dist;
+
+        var hits = Physics2D.OverlapCircleAll(center, rad, enemyMask);
+        foreach (var c in hits)
+            c.GetComponentInParent<IDamageable>()?.TakeHit(it.power);
+
+        Debug.Log($"Hit with {it.name} | range={it.range} | usedDist={dist} | hits={hits.Length}");
     }
+void OnDrawGizmosSelected(){
+    if (!Application.isPlaying) return;
+    var it = inv?.CurrentItem; if (it == null) return;
+    float dist = it.range > 0 ? it.range : 0.6f;
+    float rad  = 0.35f;
+    Vector2 origin = (Vector2)transform.position;
+    Vector2 dir = (Mathf.Abs(lastFacing.x)>=Mathf.Abs(lastFacing.y)) ? new Vector2(Mathf.Sign(lastFacing.x),0) : new Vector2(0,Mathf.Sign(lastFacing.y));
+    Vector2 center = origin + dir * dist;
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireSphere(center, rad);
+}
+
 
     public void AttackEnd() { LockMove(false); }  // đặt ở cuối clip
 
