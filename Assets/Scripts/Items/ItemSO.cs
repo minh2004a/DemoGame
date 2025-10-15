@@ -9,7 +9,6 @@ public class ItemSO : ScriptableObject
 {
     public string id;
     public Sprite icon;
-
     public ItemCategory category;
     public ToolType toolType;           // dùng khi category = Tool
     public WeaponType weaponType;       // dùng khi category = Weapon

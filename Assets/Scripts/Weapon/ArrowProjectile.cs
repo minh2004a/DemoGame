@@ -1,30 +1,26 @@
-﻿// ArrowProjectile.cs
-using UnityEngine;
+﻿using UnityEngine;
 
-public class ArrowProjectile : MonoBehaviour
-{
-    Rigidbody2D rb;
-    int damage;
-    Transform owner;
+[RequireComponent(typeof(Rigidbody2D), typeof(CapsuleCollider2D))]
+public class ArrowProjectile : MonoBehaviour {
+    int dmg; Vector2 dir; float speed; LayerMask mask;
 
-    void Awake() { rb = GetComponent<Rigidbody2D>(); }
-
-    public void Fire(Vector2 dir, float speed, int dmg, Transform shooter)
-    {
-        owner = shooter;
-        damage = dmg;
-        rb.velocity = dir.normalized * speed;
-        Destroy(gameObject, 3f);
+    void Awake(){
+        var rb = GetComponent<Rigidbody2D>(); rb.isKinematic = true; rb.gravityScale = 0;
+        var col = GetComponent<CapsuleCollider2D>();
+        col.isTrigger = true;
+        col.direction = CapsuleDirection2D.Horizontal; // cho mũi tên nằm ngang
     }
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other || other.transform.root == owner) return; // không tự bắn trúng mình
-        var d = other.GetComponentInParent<IDamageable>();
-        if (d != null) { d.TakeHit(damage); Destroy(gameObject); }
-        else if (other.gameObject.layer != LayerMask.NameToLayer("Enemy"))
-        {
-            Destroy(gameObject); // chạm tường/vật khác thì huỷ
-        }
+    public void Init(int damage, Vector2 direction, float spd, LayerMask enemyMask, float life=2f){
+        dmg = damage; dir = direction.normalized; speed = spd; mask = enemyMask;
+        Destroy(gameObject, life);
+    }
+
+    void Update(){ transform.position += (Vector3)(dir * speed * Time.deltaTime); }
+
+    void OnTriggerEnter2D(Collider2D other){
+        if (((1<<other.gameObject.layer) & mask) == 0) return;
+        other.GetComponentInParent<IDamageable>()?.TakeHit(dmg);
+        Destroy(gameObject);
     }
 }

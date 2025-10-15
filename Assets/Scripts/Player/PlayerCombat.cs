@@ -9,6 +9,7 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] Animator anim;
     [SerializeField] SpriteRenderer sprite;
     [SerializeField] LayerMask enemyMask;
+    [SerializeField] bool bowAimWithMouse = true;
     [SerializeField] float defaultHitRadius = 0.35f; // giữ bán kính mặc định
     [SerializeField] float minCooldown = 0.15f;
 
@@ -29,17 +30,41 @@ public class PlayerCombat : MonoBehaviour
     }
 
     public void OnUse(InputValue v)
-    {
-        if (!v.isPressed || cd > 0) return;
-        var it = inv?.CurrentItem;
-        if (it == null || it.category != ItemCategory.Weapon || it.weaponType != WeaponType.Sword) return;
+{
+    if (!v.isPressed || cd>0) return;
+    var it = inv?.CurrentItem; if (it==null || it.category!=ItemCategory.Weapon) return;
 
-        LockMove(true);                       // khóa di chuyển
+    if (it.weaponType == WeaponType.Bow){
+        anim?.ResetTrigger("Shoot");
+        anim?.SetTrigger("Shoot");        // Any State -> BowShoot
+        cd = Mathf.Max(minCooldown, it.cooldown);
+        return;
+    }
+    if (it.weaponType == WeaponType.Sword) {
+        LockMove(true);
         anim?.ResetTrigger("Attack");
-        anim?.SetTrigger("Attack");           // Any State -> Attack theo Trigger
+        anim?.SetTrigger("Attack");
         if (sprite) sprite.flipX = lastFacing.x < 0f;
         cd = Mathf.Max(minCooldown, it.cooldown);
+        return;
     }
+}
+
+    
+    public void ShootArrow(){
+    var it = inv?.CurrentItem; if (it == null || it.weaponType != WeaponType.Bow) return;
+
+    Vector2 origin = rb.position;
+    // hướng trước mặt: lấy từ lastFacing
+    Vector2 dir = (Mathf.Abs(lastFacing.x) >= Mathf.Abs(lastFacing.y))
+        ? new Vector2(Mathf.Sign(lastFacing.x), 0f)
+        : new Vector2(0f, Mathf.Sign(lastFacing.y));
+
+    var go = Instantiate(it.projectilePrefab, origin, Quaternion.identity);
+    var proj = go.GetComponent<ArrowProjectile>() ?? go.AddComponent<ArrowProjectile>();
+    proj.Init(it.power, dir, it.projectileSpeed, enemyMask);
+    go.transform.right = dir; // xoay sprite mũi tên
+}
 
     // Animation Events trên clip Attack:
     public void AttackStart() { LockMove(true); } // đặt ở đầu clip
