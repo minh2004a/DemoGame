@@ -39,26 +39,26 @@ public class PlayerUseItem : MonoBehaviour
         }
     }
 
-    public void OnUse(UnityEngine.InputSystem.InputValue v)
-    {
-        if (!v.isPressed) return;
+    //public void OnUse(UnityEngine.InputSystem.InputValue v)
+    //{
+    //    if (!v.isPressed) return;
 
-        Vector2 dir = (moveInput.sqrMagnitude > 0.001f) ? moveInput.normalized : lastFacing;
-        Vector2 origin = rb.position + dir * 0.15f;           // đẩy tia ra khỏi người chơi
+    //    Vector2 dir = (moveInput.sqrMagnitude > 0.001f) ? moveInput.normalized : lastFacing;
+    //    Vector2 origin = rb.position + dir * 0.15f;           // đẩy tia ra khỏi người chơi
 
-        // Bắn một tia, trúng collider gần nhất theo enemyMask
-        var hit = Physics2D.Raycast(origin, dir, attackRange, enemyMask);
-        Debug.DrawRay(origin, dir * attackRange, Color.red, 0.2f);
+    //    // Bắn một tia, trúng collider gần nhất theo enemyMask
+    //    var hit = Physics2D.Raycast(origin, dir, attackRange, enemyMask);
+    //    Debug.DrawRay(origin, dir * attackRange, Color.red, 0.2f);
 
-        if (!hit.collider) { Debug.Log("Use: no hit"); return; }
+    //    if (!hit.collider) { Debug.Log("Use: no hit"); return; }
 
-        // Collider ở child → lấy component trên parent/root
-        var target = hit.collider.GetComponentInParent<IDamageable>();
-        if (target != null)
-            target.TakeHit(swordDamage);
-        else
-            Debug.LogWarning($"Hit {hit.collider.name} nhưng không có IDamageable");
-    }
+    //    // Collider ở child → lấy component trên parent/root
+    //    var target = hit.collider.GetComponentInParent<IDamageable>();
+    //    if (target != null)
+    //        target.TakeHit(swordDamage);
+    //    else
+    //        Debug.LogWarning($"Hit {hit.collider.name} nhưng không có IDamageable");
+    //}
 
 
     void FixedUpdate() { rb.velocity = moveInput.normalized * moveSpeed; }

@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float moveSpeed = 4f;
     [SerializeField] Animator anim;
     [SerializeField] SpriteRenderer sprite;
+    public bool canMove = true;
 
     Rigidbody2D rb;
     Vector2 moveInput;
@@ -30,14 +31,9 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputValue v)
     {
+        if (!canMove) { moveInput = Vector2.zero; return; }
         moveInput = v.Get<Vector2>();
-        if (moveInput.sqrMagnitude > 0.0001f)
-        {
-            if (Mathf.Abs(moveInput.x) >= Mathf.Abs(moveInput.y))
-                lastFacing = new Vector2(Mathf.Sign(moveInput.x), 0f);
-            else
-                lastFacing = new Vector2(0f, Mathf.Sign(moveInput.y));
-        }
+        if (moveInput.sqrMagnitude > 0.0001f) lastFacing = moveInput.normalized;
     }
 
     void Update()
@@ -53,7 +49,6 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        var input = MoveLocked ? Vector2.zero : moveInput;
-        rb.velocity = input.normalized * moveSpeed;
+        rb.velocity = canMove ? moveInput.normalized * moveSpeed : Vector2.zero;
     }
 }

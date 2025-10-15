@@ -169,8 +169,8 @@ GameObject:
   - component: {fileID: 647645675}
   - component: {fileID: 647645677}
   - component: {fileID: 647645678}
-  - component: {fileID: 647645682}
   - component: {fileID: 647645683}
+  - component: {fileID: 647645684}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -337,8 +337,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 4
-  anim: {fileID: 0}
+  anim: {fileID: 647645675}
   sprite: {fileID: 0}
+  canMove: 1
 --- !u!70 &647645681
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -374,26 +375,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.018105244, y: -0.47076}
   m_Size: {x: 0.47908992, y: 0.18938974}
   m_Direction: 1
---- !u!114 &647645682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 647645672}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65496d8b0731e804c90da63a6eef77ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sword: {fileID: 11400000, guid: 2fe566f211920e44ba529e405d44c58b, type: 2}
-  bow: {fileID: 0}
-  anim: {fileID: 647645675}
-  sprite: {fileID: 0}
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 64
-  mover: {fileID: 0}
 --- !u!114 &647645683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,7 +390,7 @@ MonoBehaviour:
   hotbar:
   - item: {fileID: 0}
     count: 0
-  - item: {fileID: 11400000, guid: 44d29df7c96977047ad1c6b01b165820, type: 2}
+  - item: {fileID: 11400000, guid: 581cb79b7b7443b4baaf2d03e9af133b, type: 2}
     count: 0
   - item: {fileID: 0}
     count: 0
@@ -424,6 +405,28 @@ MonoBehaviour:
   - item: {fileID: 0}
     count: 0
   selected: 0
+--- !u!114 &647645684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 647645672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65496d8b0731e804c90da63a6eef77ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inv: {fileID: 647645683}
+  controller: {fileID: 647645678}
+  anim: {fileID: 647645675}
+  sprite: {fileID: 647645676}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  attackDistance: 0.6
+  hitRadius: 0.35
+  minCooldown: 0.15
 --- !u!1 &1030219192
 GameObject:
   m_ObjectHideFlags: 0
