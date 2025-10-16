@@ -20,4 +20,7 @@ public class ItemSO : ScriptableObject
     // cho Bow (để null với vũ khí/công cụ khác)
     public GameObject projectilePrefab;
     public float projectileSpeed = 10f;
+
+    public float projectileMaxDistance = 8f;   // tầm bắn
+    public GameObject projectileHitVFX;        // prefab hiệu ứng trúng
 }

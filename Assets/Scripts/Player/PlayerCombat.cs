@@ -86,10 +86,12 @@ public class PlayerCombat : MonoBehaviour
     var it = inv?.CurrentItem; if (it == null || it.weaponType != WeaponType.Bow) return;
     Vector2 dir = bowFacing;                  // dùng hướng đã CHỐT
     Vector2 spawn = BowSpawnPos(dir);         // nếu có hàm offset điểm bắn
-    var go = Instantiate(it.projectilePrefab, spawn, Quaternion.identity);
-    go.transform.right = dir;
-    var proj = go.GetComponent<ArrowProjectile>() ?? go.AddComponent<ArrowProjectile>();
-    proj.Init(it.power, dir, it.projectileSpeed, enemyMask);
+        var go = Instantiate(it.projectilePrefab, spawn, Quaternion.identity);
+        go.transform.right = dir;
+        var proj = go.GetComponent<ArrowProjectile>() ?? go.AddComponent<ArrowProjectile>();
+        proj.Init(it.power, dir, it.projectileSpeed, enemyMask, life: 3f, 
+        maxDist: it.projectileMaxDistance, hitVFXPrefab: it.projectileHitVFX);
+        go.transform.right = dir;
     // tùy chọn: đồng bộ sorting
     var sr = go.GetComponent<SpriteRenderer>();
     if (sr && sprite){

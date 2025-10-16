@@ -1,5 +1,5 @@
-// Types.cs
-namespace Game.Items
-{
-    public enum WeaponType { Sword }
-}
+// // Types.cs
+// namespace Game.Items
+// {
+//     public enum WeaponType { Sword }
+// }

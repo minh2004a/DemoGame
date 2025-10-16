@@ -18,7 +18,9 @@ MonoBehaviour:
   toolType: 0
   weaponType: 1
   power: 2
-  range: 0.6
+  range: 0
   cooldown: 1
   projectilePrefab: {fileID: 0}
   projectileSpeed: 10
+  projectileMaxDistance: 8
+  projectileHitVFX: {fileID: 0}
