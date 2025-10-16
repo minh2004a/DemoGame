@@ -26,13 +26,13 @@ AnimationClip:
       value: {fileID: 2133045043, guid: c92573cb005e56944b032f9f6199fef3, type: 3}
     - time: 0.16666667
       value: {fileID: -1467681462, guid: c92573cb005e56944b032f9f6199fef3, type: 3}
-    - time: 0.25
+    - time: 0.26666668
       value: {fileID: 733999670, guid: c92573cb005e56944b032f9f6199fef3, type: 3}
-    - time: 0.33333334
+    - time: 0.35
       value: {fileID: 943827282, guid: c92573cb005e56944b032f9f6199fef3, type: 3}
-    - time: 0.41666666
+    - time: 0.43333334
       value: {fileID: -27383021, guid: c92573cb005e56944b032f9f6199fef3, type: 3}
-    - time: 0.5
+    - time: 0.51666665
       value: {fileID: -132989303, guid: c92573cb005e56944b032f9f6199fef3, type: 3}
     attribute: m_Sprite
     path: 
@@ -68,7 +68,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.51666665
+    m_StopTime: 0.5333333
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -87,4 +87,25 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0
+    functionName: BowStart
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.23333333
+    functionName: ShootArrow
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.5
+    functionName: BowEnd
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0

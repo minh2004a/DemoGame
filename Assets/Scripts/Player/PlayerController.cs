@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     Vector2 moveInput;
     Vector2 lastFacing = Vector2.right;
+    Vector2 pendingMoveInput;
 
     public bool MoveLocked { get; private set; }
     public void SetMoveLock(bool locked)
@@ -28,23 +29,41 @@ public class PlayerController : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
+    // helper
+    void UpdateFacingFrom(Vector2 v)
+    {
+        if (v.sqrMagnitude > 0.0001f)
+            lastFacing = (Mathf.Abs(v.x) >= Mathf.Abs(v.y))
+                ? new Vector2(Mathf.Sign(v.x), 0)
+                : new Vector2(0, Mathf.Sign(v.y));
+
+    }
+
+    public Vector2 PendingFacing4()
+    {
+        var v = pendingMoveInput;
+        if (v.sqrMagnitude <= 0.0001f) return Vector2.zero;
+        return (Mathf.Abs(v.x) >= Mathf.Abs(v.y))
+            ? new Vector2(Mathf.Sign(v.x), 0)
+            : new Vector2(0, Mathf.Sign(v.y));
+    }
+
+
+    public void ApplyPendingMove(){
+            if (pendingMoveInput.sqrMagnitude > 0.0001f){
+            moveInput = pendingMoveInput;
+            UpdateFacingFrom(moveInput);
+        }
+        pendingMoveInput = Vector2.zero;
+    }
 
     public void OnMove(InputValue v)
-{
-    if (!canMove) { moveInput = Vector2.zero; return; }
-    moveInput = v.Get<Vector2>();
-
-    if (moveInput.sqrMagnitude > 0.0001f)
     {
-        // Ưu tiên ngang khi chéo với W (AW/DW)
-        if (moveInput.y > 0.01f && Mathf.Abs(moveInput.x) > 0.01f)
-            lastFacing = new Vector2(Mathf.Sign(moveInput.x), 0f);
-        else if (Mathf.Abs(moveInput.x) >= Mathf.Abs(moveInput.y))
-            lastFacing = new Vector2(Mathf.Sign(moveInput.x), 0f);   // ưu tiên ngang mọi chéo
-        else
-            lastFacing = new Vector2(0f, Mathf.Sign(moveInput.y));   // lên/xuống
+       var input = v.Get<Vector2>();
+    if (!canMove){ pendingMoveInput = input; return; } // chỉ lưu, không áp
+    moveInput = input;
+    UpdateFacingFrom(moveInput);
     }
-}
 
 
     void Update()
@@ -58,8 +77,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
-    {
-        rb.velocity = canMove ? moveInput.normalized * moveSpeed : Vector2.zero;
-    }
+   void FixedUpdate(){
+    rb.velocity = canMove ? moveInput.normalized * moveSpeed : Vector2.zero;
+}
 }

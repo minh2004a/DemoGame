@@ -1,3 +1,4 @@
+﻿
 ﻿﻿// PlayerCombat.cs (tối giản cho kiếm)
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -56,32 +57,29 @@ public class PlayerCombat : MonoBehaviour
             ? new Vector2(Mathf.Sign(lastFacing.x), 0)
             : new Vector2(0, Mathf.Sign(lastFacing.y));
     }
-    public void OnUse(InputValue v)
-{
-    if (!v.isPressed || cd>0) return;
+    public void OnUse(InputValue v){
+    if (!v.isPressed || cd>0 || swordLocked || bowLocked) return;
     var it = inv?.CurrentItem; if (it==null || it.category!=ItemCategory.Weapon) return;
 
-   if (it.weaponType == WeaponType.Bow)
-    {
-        bowLocked = true; bowTimer = bowFailSafe;
-        bowFacing = Facing4();         // CHỐT hướng ngay lúc bấm
-        LockMove(true);                // khóa di chuyển
-        anim?.ResetTrigger("Shoot");
-        anim?.SetTrigger("Shoot");     // Any State → BowShoot
+    if (it.weaponType == WeaponType.Bow){
+        anim?.ResetTrigger("Shoot"); anim?.SetTrigger("Shoot");
         cd = Mathf.Max(minCooldown, it.cooldown);
         return;
     }
-
-   if (it.weaponType == WeaponType.Sword) {
-    swordLocked = true; swordTimer = swordFailSafe;
-    swordFacing = Facing4();          // CHỐT hướng khi bấm
-    LockMove(true);
-    anim?.ResetTrigger("Attack");
-    anim?.SetTrigger("Attack");
-    cd = Mathf.Max(minCooldown, it.cooldown);
-    return;
+    if (it.weaponType == WeaponType.Sword){
+        anim?.ResetTrigger("Attack"); anim?.SetTrigger("Attack");
+        cd = Mathf.Max(minCooldown, it.cooldown);
+        return;
     }
 }
+
+    void ApplyFacingAndFlip(Vector2 face)
+    {
+        anim?.SetFloat("Horizontal", face.x);     // nếu dùng 1 clip side, thay = Mathf.Abs(face.x)
+        anim?.SetFloat("Vertical", face.y);
+        anim?.SetFloat("Speed", 0f);
+        if (sprite) sprite.flipX = face.x < 0f;   // chỉ lật render, không đổi collider :contentReference[oaicite:0]{index=0}
+    }
 
     public void ShootArrow()
 {
@@ -113,8 +111,16 @@ Vector2 BowSpawnPos(Vector2 dir)
 }
 
     // Animation Events trên clip Attack:
-    public void AttackStart() { LockMove(true); } // đặt ở đầu clip
-    public void BowStart(){ bowLocked = true; bowTimer = bowFailSafe; LockMove(true); }
+    public void AttackStart(){
+        swordTimer = swordFailSafe;
+        swordLocked = true; swordFacing = Facing4();
+        LockMove(true);
+        }
+    public void BowStart(){
+        bowTimer = bowFailSafe;
+        bowLocked = true; bowFacing = Facing4();
+        LockMove(true);
+    }
 
     public void AttackHit() // gọi bằng Animation Event
     {
@@ -142,14 +148,38 @@ Vector2 BowSpawnPos(Vector2 dir)
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(center, rad);
     }
-        
-    public void AttackEnd(){ swordLocked = false; LockMove(false); }
-    public void BowEnd(){ bowLocked = false; LockMove(false); }
+
+    public void AttackEnd()
+    {
+       // nếu người chơi vừa nhấn ngược chiều khi đang bị khóa → lấy hướng đó
+        var pf = controller ? controller.PendingFacing4() : Vector2.zero;
+        if (pf != Vector2.zero) lastFacing = pf;
+
+        controller?.ApplyPendingMove();   // khôi phục input đang giữ
+        ApplyFacingAndFlip(lastFacing);   // FLIP NGAY lúc end
+        swordLocked = false;
+            LockMove(false);
+    
+    }
+
+public void BowEnd(){
+        var pf = controller ? controller.PendingFacing4() : Vector2.zero;
+        if (pf != Vector2.zero) lastFacing = pf;
+
+        controller?.ApplyPendingMove();
+        ApplyFacingAndFlip(lastFacing);
+        bowLocked = false;
+        LockMove(false);
+    }
     void LockMove(bool on)
     {
-        if (controller) controller.canMove = !on;
+        if (controller)
+        {
+            controller.canMove = !on;
+            controller.SetMoveLock(on);   // cập nhật MoveLocked cho Animator.Speed
+        }
         rb.velocity = Vector2.zero;
     }
 
-    
+
 }
